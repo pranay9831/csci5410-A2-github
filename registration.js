@@ -1,10 +1,13 @@
 const express= require('express');
-const Firestore= require('@google-cloud/firestore')
+const Firestore = jest.isMockFunction() ? require('@google-cloud/firestore').Firestore : require('@google-cloud/firestore');
+
+const cors=require('cors')
+
 require('dotenv').config();
 const gcpCredentials=require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 const app = express();
  app.use(express.json());
-
+app.use(cors({origin:'*'}));
  const db=new Firestore({
   projectId: gcpCredentials.project_id,
   credentials: {
@@ -23,8 +26,14 @@ const data={
     email,
     location
 };
+console.log(data)
+console.log(req.body)
+if(email===""){
+  res.status(400).send("enter value")
+}
+else{
 
-const docRef=db.collection('Reg-030').doc(email);
+  const docRef=db.collection('Reg-030').doc(email);
 const doc=await docRef.get();
 if(doc.exists){
     res.status(400).send('Email already Exists')
@@ -39,11 +48,13 @@ else{
   }
   await db.collection('state-030').doc(email).set(state);
   
-    res.status(201).send('User Registration Succesful')
+    res.status(201).send({response:'User Registration Successful'})
 }
 
 
+}
+
 
  })
-
+module.exports=app;
  app.listen(3001, ()=>console.log('Server running on port 3001'));

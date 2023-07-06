@@ -5,3 +5,6 @@ node_modules
 *.log
 .dockerignore
 .dockerenv
+__tests__
+__mocks__
+FrontEnd
